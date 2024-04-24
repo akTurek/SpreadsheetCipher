@@ -18,7 +18,7 @@ public class CipherMySheet {
 
     }
 
-    public void enkriptexl(String path, String myKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
+    public static void enkriptexl(String path, String myKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
 
         FileInputStream inputStream = new FileInputStream(new File(path));
         Workbook workbook = WorkbookFactory.create(inputStream);
@@ -38,7 +38,7 @@ public class CipherMySheet {
 
     }
 
-    public void deEnkriptexl(String path, String myKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
+    public static void deEnkriptexl(String path, String myKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
 
         String decodedCell;
         FileInputStream inputStream = new FileInputStream(new File(path));
@@ -59,7 +59,7 @@ public class CipherMySheet {
             workbook.close();
     }
 
-    private String aByteValueOfCell(String myKey, Cell cell) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException {
+    private static String aByteValueOfCell(String myKey, Cell cell) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException {
 
         byte[] encryptedData = null;
         byte[] key = myKey.getBytes(); // Dolžina ključa mora biti 16 bajtov
@@ -81,16 +81,14 @@ public class CipherMySheet {
                 encryptedData = cipher.doFinal((cell.getCellFormula()).getBytes(StandardCharsets.UTF_8));
                 break;
             default:
-                encryptedData = cipher.doFinal("Nepodprt format".getBytes(StandardCharsets.UTF_8));
-
-
+                encryptedData = cipher.doFinal(cell.getStringCellValue().getBytes(StandardCharsets.UTF_8));
         };
 
         String encriptedData = Base64.getEncoder().encodeToString(encryptedData);
         return encriptedData;
     }
 
-    private String aCellValueOfByte(String myKey, Cell cell) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+    private static String aCellValueOfByte(String myKey, Cell cell) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
         byte[] key = myKey.getBytes();
         SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
         Cipher cipher = Cipher.getInstance("AES");
@@ -102,7 +100,7 @@ public class CipherMySheet {
         return decriptedData;
     }
 
-    private void insertRightType(String decodedCell, Cell cell){
+    private static void insertRightType(String decodedCell, Cell cell){
         if (isNumeric(decodedCell)){
             cell.setCellValue(Double.parseDouble(decodedCell));
         } else if (isBoolean(decodedCell)) {
